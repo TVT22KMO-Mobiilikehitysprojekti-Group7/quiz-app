@@ -5,8 +5,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 const Home = () => {
   const navigation = useNavigation();
   const route = useRoute();
-
-  const playerNickname = route.params?.playerNickname || 'vieras';
+  
+  const playerNickname = route.params?.nickname || 'vieras';;
 
   return (
     <View>
