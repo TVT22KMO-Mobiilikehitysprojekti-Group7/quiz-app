@@ -1,5 +1,5 @@
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -11,11 +11,6 @@ const firebaseConfig = {
   appId: "1:772589460127:web:09a188af8a45088efe60aa"
 };
 
-// Alusta Firebase, jos sitä ei ole jo alustettu
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-
-  // Vienti firestore viite
-  const db = firebase.firestore();
-  export default db;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+export default db;
