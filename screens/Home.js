@@ -13,11 +13,11 @@ const Home = () => {
       <Text>Hei, {playerNickname}!</Text>
       <Button
         title="Pelaa"
-        onPress={() => navigation.navigate('Play')}
+        onPress={() => navigation.navigate('GameSelection')}
       />
       <Button
         title="Pisteet"
-        onPress={() => navigation.navigate('Scores')}
+        onPress={() => navigation.navigate('Scoreboard')}
       />
       <Button
         title="Asetukset"

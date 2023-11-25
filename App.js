@@ -5,6 +5,8 @@ import Start from './screens/Start';
 import Nickname from './screens/Nickname';
 import Home from './screens/Home';
 import Settings from './screens/Settings';
+import GameSelection from './screens/GameSelection';
+import Game from './screens/Game';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +18,8 @@ const App = () => {
         <Stack.Screen name="Nickname" component={Nickname} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="GameSelection" component={GameSelection} />
+        <Stack.Screen name="Game" component={Game} />
       </Stack.Navigator>
     </NavigationContainer>
   );
