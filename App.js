@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Start from './screens/Start';
@@ -7,10 +7,15 @@ import Home from './screens/Home';
 import Settings from './screens/Settings';
 import GameSelection from './screens/GameSelection';
 import Game from './screens/Game';
+import { preloadQuestionsForAllCategories } from './data/dataService';
 
 const Stack = createStackNavigator();
 
 const App = () => {
+  useEffect(() => {
+    preloadQuestionsForAllCategories(); // Lataa kysymykset käynnistyessä
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Start">
