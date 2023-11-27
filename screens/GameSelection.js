@@ -1,14 +1,27 @@
 import React from 'react';
 import { View, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { fetchQuestionsFromCategory, storeQuestionsInStorage, loadQuestionsFromStorage } from '../data/dataService';
 
 const GameSelection = () => {
   const navigation = useNavigation();
 
   const handleCategorySelect = async (category) => {
-    // Voit halutessasi hakea kysymykset tässä vaiheessa tai Game-näytössä
+    // Yritä ensin ladata kysymykset paikallisesta tallennustilasta
+    let questions = await loadQuestionsFromStorage(category);
+
+    if (questions && questions.length > 0) {
+      console.log(`Kysymykset ladattu paikallisesta tallennustilasta kategorialle: ${category}`);
+    } else {
+      console.log(`Kysymyksiä ei löytynyt paikallisesta tallennustilasta, haetaan Firestoresta kategorialle: ${category}`);
+      questions = await fetchQuestionsFromCategory(category);
+      await storeQuestionsInStorage(category, questions);
+    }
+
+    // Navigoi Game-näyttöön välittäen kysymykset
     navigation.navigate('Game', { category });
   };
+
 
   return (
     <View>
