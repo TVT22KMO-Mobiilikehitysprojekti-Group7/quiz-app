@@ -41,7 +41,7 @@ const Game = ({ route }) => {
       Alert.alert('Väärä vastaus', `Oikea vastaus oli: ${correctAnswer}`, [
         {
           text: 'OK',
-          onPress: () => navigation.goBack(), // Takaisin painikkeen logiikka väärässä vastauksessa
+          onPress: () => navigation.navigate('Endgame'), // Takaisin painikkeen logiikka väärässä vastauksessa
         },
       ]);
     }
