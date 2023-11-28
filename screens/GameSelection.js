@@ -36,6 +36,7 @@ const GameSelection = () => {
     <Button title="Ruoka ja Juoma" onPress={() => handleCategorySelect('RuokaJaJuoma')} />
     <Button title="Taide ja Kulttuuri" onPress={() => handleCategorySelect('TaideJaKulttuuri')} />
     {/* Lisää tarvittaessa muita kategorioita */}
+    <Button title="Takaisin" onPress={() => navigation.goBack()} />
   </View>
   );
 };
