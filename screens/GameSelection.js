@@ -7,19 +7,12 @@ const GameSelection = () => {
   const navigation = useNavigation();
 
   const handleCategorySelect = async (category) => {
-    // Yritä ensin ladata kysymykset paikallisesta tallennustilasta
-    let questions = await loadQuestionsFromStorage(category);
-
+    questions = await fetchQuestionsFromCategory(category);
+    await storeQuestionsInStorage(category, questions);
     if (questions && questions.length > 0) {
-      console.log(`Kysymykset ladattu paikallisesta tallennustilasta kategorialle: ${category}`);
-    } else {
-      console.log(`Kysymyksiä ei löytynyt paikallisesta tallennustilasta, haetaan Firestoresta kategorialle: ${category}`);
-      questions = await fetchQuestionsFromCategory(category);
-      await storeQuestionsInStorage(category, questions);
+      // Navigoi Game-näyttöön välittäen kysymykset
+      navigation.navigate('Game', { category });
     }
-
-    // Navigoi Game-näyttöön välittäen kysymykset
-    navigation.navigate('Game', { category });
   };
 
 
@@ -32,8 +25,6 @@ const GameSelection = () => {
     <Button title="Elokuvat ja Sarjat" onPress={() => handleCategorySelect('ElokuvatJaSarjat')} />
     <Button title="Urheilu" onPress={() => handleCategorySelect('Urheilu')} />
     <Button title="Luonto" onPress={() => handleCategorySelect('Luonto')} />
-    <Button title="Teknologia" onPress={() => handleCategorySelect('Teknologia')} />
-    <Button title="Ruoka ja Juoma" onPress={() => handleCategorySelect('RuokaJaJuoma')} />
     <Button title="Taide ja Kulttuuri" onPress={() => handleCategorySelect('TaideJaKulttuuri')} />
     {/* Lisää tarvittaessa muita kategorioita */}
     <Button title="Takaisin" onPress={() => navigation.goBack()} />
