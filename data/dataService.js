@@ -42,7 +42,7 @@ export const loadQuestionsFromStorage = async (category) => {
 };
 
 //Tässä koodissa preloadQuestionsForAllCategories käy läpi kaikki määritellyt kategoriat, hakee kysymykset kustakin ja tallentaa ne paikalliseen tallennustilaan.
-const categories = ["Historia", "Maantieto", "Tiede", "Viihde", "ElokuvatJaSarjat", "Urheilu", "Luonto", "Teknologia", "RuokaJaJuoma", "TaideJaKulttuuri"];
+const categories = ["Historia", "Maantieto", "Tiede", "Viihde", "ElokuvatJaSarjat", "Urheilu", "Luonto", "TaideJaKulttuuri"];
 
 export const preloadQuestionsForAllCategories = async () => {
   for (const category of categories) {
