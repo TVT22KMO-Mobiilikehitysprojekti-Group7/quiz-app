@@ -15,55 +15,89 @@ const Game = ({ route }) => {
   const [scoringTimer, setScoringTimer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [canAnswer, setCanAnswer] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
 
-  let questionsAnswered = 0;
+  const [questionsAnswered, setQuestionsAnswered] = useState(0);
 
   useEffect(() => {
     const fetchQuestions = async () => {
       const loadedQuestions = await loadQuestionsFromStorage(category);
-
-      setLoadedQuestions(loadedQuestions);
-
-      const questions = loadedQuestions.map((question) => question.Kysymys);
-      const options = loadedQuestions.map((question) => question.Vaihtoehdot);
-
-      setQuestions(questions);
-      setOptions(options);
+      const shuffledQuestions = shuffleArray(loadedQuestions);
+      setLoadedQuestions(shuffledQuestions);
       setLoading(false);
     };
 
     fetchQuestions();
   }, [category]);
 
+
   useEffect(() => {
     setTimers();
     // Clear the scoring timer when the component unmounts
     return () => clearInterval(delayTimer);
   }, []);
-  
+
+  const shuffleArray = (array) => {
+    let currentIndex = array.length,  randomIndex;
+
+    // While there remain elements to shuffle...
+    while (currentIndex !== 0) {
+
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
+  }
+
 
   const handleAnswerQuestion = (option) => {
     setCanAnswer(false);
     clearInterval(scoringTimer);
-    const correctAnswer = loadedQuestions[currentQuestionIndex].Vastaus;
+    const currentQuestion = loadedQuestions[currentQuestionIndex];
+    const correctAnswer = currentQuestion.Vastaus;
+
+    let isCorrect = false;
 
     if (option === correctAnswer) {
-      questionsAnswered++;
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      if (questionsAnswered >= 2) {
-        Alert.alert('Voitit Pelin!', 'Hyvin tehty!', [{ text: 'OK', onPress: () => navigation.navigate('Endgame', {score}) }]);
-      } else {
-        Alert.alert('Oikea vastaus', 'Hyvin tehty!', [{ text: 'OK' }]);
-        setScore(score + 1000);
-        setTimers();
-      }
+      isCorrect = true;
+      setScore(score + 1000);
+      Alert.alert('Oikea vastaus', 'Hyvin tehty!', [{ text: 'OK', onPress: () => checkGameEnd(isCorrect) }]);
     } else {
       Alert.alert('Väärä vastaus', `Oikea vastaus oli: ${correctAnswer}`, [
-        {
-          text: 'OK',
-          onPress: () => navigation.navigate('Endgame', {score}), // Takaisin painikkeen logiikka väärässä vastauksessa
-        },
+        { text: 'OK', onPress: () => checkGameEnd(isCorrect) },
       ]);
+    }
+  };
+
+  const checkGameEnd = (isCorrect) => {
+    if (isCorrect) {
+      setQuestionsAnswered(questionsAnswered + 1);
+
+      if (questionsAnswered + 1 >= 10) {
+        setGameEnded(true);
+        navigation.navigate('Endgame', { score });
+        return;
+      }
+    }
+
+    // Poista käytetty kysymys ja päivitä tila
+    const newLoadedQuestions = loadedQuestions.filter((_, index) => index !== currentQuestionIndex);
+    setLoadedQuestions(newLoadedQuestions);
+
+    if (newLoadedQuestions.length > 0) {
+      // Valitse satunnainen indeksi seuraavalle kysymykselle
+      const nextQuestionIndex = Math.floor(Math.random() * newLoadedQuestions.length);
+      setCurrentQuestionIndex(nextQuestionIndex);
+      setTimers();
+    } else if (!gameEnded) {
+      // Jos peli ei ole vielä päättynyt, mutta kysymykset ovat loppuneet, navigoi Endgame-näyttöön
+      navigation.navigate('Endgame', { score });
     }
   };
 
@@ -86,9 +120,10 @@ const Game = ({ route }) => {
 
   return (
     <View>
-       <Text style={{ fontSize: 24 }}>Pisteet: {score}</Text>
-      <Text>{questions[currentQuestionIndex]}</Text>
-      {options[currentQuestionIndex].map((option, idx) => (
+      <Text style={{ fontSize: 24 }}>Pisteet: {score}</Text>
+      <Text style={{ fontSize: 20 }}>Kysymys {questionsAnswered + 1} / 10</Text>
+      <Text>{loadedQuestions[currentQuestionIndex]?.Kysymys}</Text>
+      {loadedQuestions[currentQuestionIndex]?.Vaihtoehdot.map((option, idx) => (
         <TouchableOpacity
           disabled={!canAnswer}
           key={idx}
