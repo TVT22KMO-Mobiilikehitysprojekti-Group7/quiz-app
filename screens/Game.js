@@ -20,14 +20,27 @@ const Game = ({ route }) => {
 
   useEffect(() => {
     const fetchQuestions = async () => {
-      const loadedQuestions = await loadQuestionsFromStorage(category);
-      const shuffledQuestions = shuffleArray(loadedQuestions);
+      let categoriesArray = Array.isArray(category) ? category : [category]; // Varmista, että category on taulukko
+      console.log("Valitut kategoriat:", categoriesArray); // Tulosta valitut kategoriat
+  
+      let questionsFromAllCategories = [];
+  
+      for (let cat of categoriesArray) {
+        console.log("Ladataan kysymyksiä kategoriasta:", cat); // Tulosta latausviesti
+        const questions = await loadQuestionsFromStorage(cat);
+        questionsFromAllCategories = [...questionsFromAllCategories, ...questions];
+      }
+  
+      const shuffledQuestions = shuffleArray(questionsFromAllCategories);
+      console.log("Ladatut kysymykset:", shuffledQuestions); // Tarkista ladatut kysymykset
       setLoadedQuestions(shuffledQuestions);
       setLoading(false);
     };
-
+  
     fetchQuestions();
   }, [category]);
+  
+  
 
 
   useEffect(() => {
@@ -56,6 +69,7 @@ const Game = ({ route }) => {
 
 
   const handleAnswerQuestion = (option) => {
+    console.log("Nykyinen kysymysindeksi:", currentQuestionIndex); // Tarkista indeksi
     setCanAnswer(false);
     clearInterval(scoringTimer);
     const currentQuestion = loadedQuestions[currentQuestionIndex];
