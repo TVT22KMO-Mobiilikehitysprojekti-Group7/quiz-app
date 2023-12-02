@@ -15,7 +15,6 @@ const Game = ({ route }) => {
   const [scoringTimer, setScoringTimer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [canAnswer, setCanAnswer] = useState(false);
-  const [gameEnded, setGameEnded] = useState(false);
 
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
 
@@ -61,45 +60,40 @@ const Game = ({ route }) => {
     clearInterval(scoringTimer);
     const currentQuestion = loadedQuestions[currentQuestionIndex];
     const correctAnswer = currentQuestion.Vastaus;
-
-    let isCorrect = false;
-
+  
     if (option === correctAnswer) {
-      isCorrect = true;
-      setScore(score + 1000);
-      Alert.alert('Oikea vastaus', 'Hyvin tehty!', [{ text: 'OK', onPress: () => checkGameEnd(isCorrect) }]);
+      let newScore = score + 1000; // Päivitä pisteet ennen navigointia
+      setQuestionsAnswered(questionsAnswered + 1);
+  
+      if (questionsAnswered + 1 >= 10) {
+        navigation.navigate('Endgame', { score: newScore }); // Lähetä uusi pistemäärä
+      } else {
+        setScore(newScore); // Päivitä pisteet normaalisti
+        Alert.alert('Oikea vastaus', 'Hyvin tehty!', [{ text: 'OK', onPress: () => nextQuestion() }]);
+      }
     } else {
+      // Jos vastaus on väärin, näytä ilmoitus ja navigoi Endgameen
       Alert.alert('Väärä vastaus', `Oikea vastaus oli: ${correctAnswer}`, [
-        { text: 'OK', onPress: () => checkGameEnd(isCorrect) },
+        { text: 'OK', onPress: () => navigation.navigate('Endgame', { score }) },
       ]);
     }
   };
 
-  const checkGameEnd = (isCorrect) => {
-    if (isCorrect) {
-      setQuestionsAnswered(questionsAnswered + 1);
 
-      if (questionsAnswered + 1 >= 10) {
-        setGameEnded(true);
-        navigation.navigate('Endgame', { score });
-        return;
-      }
-    }
-
-    // Poista käytetty kysymys ja päivitä tila
+  const nextQuestion = () => {
     const newLoadedQuestions = loadedQuestions.filter((_, index) => index !== currentQuestionIndex);
     setLoadedQuestions(newLoadedQuestions);
-
+  
     if (newLoadedQuestions.length > 0) {
-      // Valitse satunnainen indeksi seuraavalle kysymykselle
       const nextQuestionIndex = Math.floor(Math.random() * newLoadedQuestions.length);
       setCurrentQuestionIndex(nextQuestionIndex);
       setTimers();
-    } else if (!gameEnded) {
-      // Jos peli ei ole vielä päättynyt, mutta kysymykset ovat loppuneet, navigoi Endgame-näyttöön
+    } else {
+      // Kun peli päättyy
       navigation.navigate('Endgame', { score });
     }
   };
+
 
   const setTimers = () => {
     const delayTimer = setTimeout(() => {
