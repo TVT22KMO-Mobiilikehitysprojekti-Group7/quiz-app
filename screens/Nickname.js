@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Alert, ToastAndroid } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { resetLocalScores } from '../data/score';
 
 const Nickname = () => {
   const route = useRoute();
@@ -39,11 +40,11 @@ const Nickname = () => {
 
   const changeNicknameAndResetPoints = () => {
     setNicknameToStorage(nickname);
-    //TODO: Reset points
-    navigation.navigate('Home', { nickname: nickname })
-  }
+    resetLocalScores(); // Nollaa pisteet
+    navigation.navigate('Home', { nickname: nickname });
+  };
 
-  const nicknameChangeAlert = () => 
+  const nicknameChangeAlert = () =>
     Alert.alert('Huomio!', 'Nimimerkin vaihtaminen nollaa pisteesi. Haluatko varmasti vaihtaa nimimerkin?', [
       {
         text: 'Peruuta'
@@ -69,7 +70,7 @@ const Nickname = () => {
       setNicknameToStorage(nickname)
       navigation.navigate('Home', { nickname: nickname })
     }
-  }  
+  }
 
   return (
     <View>

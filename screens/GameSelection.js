@@ -1,35 +1,65 @@
-import React from 'react';
-import { View, Button } from 'react-native';
+import React, { useState } from 'react';
+import { View, Button, ScrollView, TouchableOpacity, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { fetchQuestionsFromCategory, storeQuestionsInStorage, loadQuestionsFromStorage } from '../data/dataService';
+import { fetchQuestionsFromMultipleCategories } from '../data/dataService';
+import { storeQuestionsInStorage } from '../data/dataService';
 
 const GameSelection = () => {
   const navigation = useNavigation();
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  const categories = [
+    'Historia', 'Maantieto', 'Tiede', 'Viihde',
+    'Elokuvat ja Sarjat', 'Urheilu', 'Luonto', 'Taide ja Kulttuuri'
+  ];
 
   const handleCategorySelect = async (category) => {
-    questions = await fetchQuestionsFromCategory(category);
+    const questions = await fetchQuestionsFromMultipleCategories(category);
     await storeQuestionsInStorage(category, questions);
     if (questions && questions.length > 0) {
-      // Navigoi Game-näyttöön välittäen kysymykset
       navigation.navigate('Game', { category });
     }
   };
 
+  const toggleCategorySelection = (category) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter(cat => cat !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  const startGame = async () => {
+    if (selectedCategories.length === 0) {
+      alert('Valitse vähintään yksi kategoria');
+      return;
+    }
+
+    const questions = await fetchQuestionsFromMultipleCategories(selectedCategories);
+    await storeQuestionsInStorage('mixed', questions);
+    navigation.navigate('Game', { category: 'mixed' });
+  };
 
   return (
-    <View>
-    <Button title="Historia" onPress={() => handleCategorySelect('Historia')} />
-    <Button title="Maantieto" onPress={() => handleCategorySelect('Maantieto')} />
-    <Button title="Tiede" onPress={() => handleCategorySelect('Tiede')} />
-    <Button title="Viihde" onPress={() => handleCategorySelect('Viihde')} />
-    <Button title="Elokuvat ja Sarjat" onPress={() => handleCategorySelect('ElokuvatJaSarjat')} />
-    <Button title="Urheilu" onPress={() => handleCategorySelect('Urheilu')} />
-    <Button title="Luonto" onPress={() => handleCategorySelect('Luonto')} />
-    <Button title="Taide ja Kulttuuri" onPress={() => handleCategorySelect('TaideJaKulttuuri')} />
-    {/* Lisää tarvittaessa muita kategorioita */}
-    <Button title="Takaisin" onPress={() => navigation.goBack()} />
-  </View>
+    <ScrollView>
+      <View>
+        {categories.map((category, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => toggleCategorySelection(category)}
+            style={{ 
+              margin: 10, padding: 10, 
+              backgroundColor: selectedCategories.includes(category) ? 'lightblue' : 'lightgray', 
+              borderRadius: 5 
+            }}
+          >
+            <Text>{category}</Text>
+          </TouchableOpacity>
+        ))}
+        <Button title="Aloita peli" onPress={startGame} />
+        <Button title="Takaisin" onPress={() => navigation.goBack()} />
+      </View>
+    </ScrollView>
   );
 };
-
 export default GameSelection;

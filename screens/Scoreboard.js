@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocalScores } from '../data/score';
 
 const Scoreboard = () => {
@@ -9,20 +8,26 @@ const Scoreboard = () => {
     const [localScores, setLocalScores] = useState([]);
 
     useEffect(() => {
-      const localScores = async () => {
-        const localScores = await getLocalScores();
-        console.log(localScores);
-        setLocalScores(localScores);
+      const loadScores = async () => {
+        const scores = await getLocalScores();
+        console.log(scores);
+        setLocalScores(scores);
       }
-      localScores();
+      loadScores();
     }, []);
-  
+
+    // Järjestä tulokset ennen FlatListiin syöttämistä
+    const sortedScores = localScores && localScores.length > 0
+        ? localScores.sort((a, b) => b - a)
+        : [];
+
     return (
       <View>
         <Text> Scoreboard </Text>
         <FlatList
-          data={localScores.sort((a, b) => b - a)}
+          data={sortedScores}
           renderItem={({item}) => <Text>{item}</Text>}
+          keyExtractor={(item, index) => index.toString()} // Lisää keyExtractor
         />
         <Button
           title="Takaisin"
@@ -30,7 +35,6 @@ const Scoreboard = () => {
         />
       </View>
     );
-   
 };
 
 export default Scoreboard;

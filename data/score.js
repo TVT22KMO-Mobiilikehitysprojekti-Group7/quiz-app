@@ -1,23 +1,23 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const saveScore = async (score) => {
-  // TODO: Tallenna pisteet myös palvelimelle
   let localScores = await getLocalScores();
-  let minScore = 0;
-  if (localScores) {
-      minScore = Math.min(...localScores);
-      console.log(minScore);
-  } else {
+  console.log("Existing scores:", localScores); // Logita olemassa olevat pisteet
+
+  if (!localScores) {
     localScores = [];
   }
-  if (minScore < score) {
-      localScores.push(score);
-  }
+
+  localScores.push(score);
   if (localScores.length > 10) {
-      //Remove lowest score
+    localScores.sort((a, b) => b - a);
+    localScores = localScores.slice(0, 10); // Säilytä vain 10 parasta tulosta
   }
-  setLocalScores(localScores);
+
+  console.log("New scores to save:", localScores); // Logita uudet tallennettavat pisteet
+  await setLocalScores(localScores);
 }
+
 
 export const getLocalScores = async () => {
   try {
@@ -38,4 +38,12 @@ const setLocalScores = async (scores) => {
     // Tallennusvirheen käsittely
     console.error("Error storing local scores: ", e);
   }
+  };
+
+  export const resetLocalScores = async () => {
+    try {
+      await AsyncStorage.setItem('local_scores', JSON.stringify([]));
+    } catch (error) {
+      console.error("Error resetting local scores: ", error);
+    }
   };
