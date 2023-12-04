@@ -10,7 +10,7 @@ const GameSelection = () => {
 
   const categories = [
     'Historia', 'Maantieto', 'Tiede', 'Viihde',
-    'Elokuvat ja Sarjat', 'Urheilu', 'Luonto', 'Taide ja Kulttuuri'
+    'ElokuvatJaSarjat', 'Urheilu', 'Luonto', 'TaideJaKulttuuri'
   ];
 
   const handleCategorySelect = async (category) => {
