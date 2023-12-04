@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  
-  const playerNickname = route.params?.nickname || 'vieras';;
+  const [playerNickname, setPlayerNickname] = useState('vieras');
+
+  const loadNickname = async () => {
+    try {
+      const storedNickname = await AsyncStorage.getItem('nickname');
+      if (storedNickname) {
+        setPlayerNickname(storedNickname);
+      }
+    } catch (error) {
+      console.error('Virhe ladataessa nimimerkkiä:', error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadNickname();
+    }, [])
+  );
 
   return (
     <View>
