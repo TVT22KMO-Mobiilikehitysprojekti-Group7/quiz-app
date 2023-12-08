@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ImageBackground, StyleSheet } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import StandardButton from '../components/StandardButton';
 
-const Home = () => {
+export default Home = () => {
   const navigation = useNavigation();
   const [playerNickname, setPlayerNickname] = useState('vieras');
 
@@ -25,22 +26,55 @@ const Home = () => {
   );
 
   return (
-    <View>
-      <Text>Hei, {playerNickname}!</Text>
-      <Button
-        title="Pelaa"
+    <ImageBackground
+      source={require('../assets/tietoviisas-on-screen.png')}
+      style={styles.backgroundImage}
+    >
+      <Text style={styles.greetingText}>Hei, {playerNickname}!</Text>
+      <StandardButton
+        text={"Pelaa"}
         onPress={() => navigation.navigate('GameSelection')}
+        buttonStyles={styles.buttonPelaa}
       />
-      <Button
-        title="Pisteet"
+      <StandardButton
+        text={"Pisteet"}
         onPress={() => navigation.navigate('Scoreboard')}
+        buttonStyles={styles.buttonPisteet}
       />
-      <Button
-        title="Asetukset"
+      <StandardButton
+        text={"Asetukset"}
         onPress={() => navigation.navigate('Settings')}
+        buttonStyles={styles.buttonAsetukset}
       />
-    </View>
+    </ImageBackground>
   );
 };
 
-export default Home;
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center'
+  },
+  greetingText: {
+    color: 'lightgreen',
+    fontSize: 28,
+    textAlign: 'center',
+    top: 110
+  },
+  buttonPelaa: {
+    bottom: 180,
+    left: 20,
+    right: 20,
+  },
+  buttonPisteet: {
+    bottom: 100,
+    left: 20,
+    right: 20,
+  },
+  buttonAsetukset: {
+    bottom: 20,
+    left: 20,
+    right: 20,
+  }
+});

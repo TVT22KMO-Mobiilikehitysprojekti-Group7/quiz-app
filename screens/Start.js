@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { Button } from 'react-native';
+import { Text, ImageBackground, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import StandardButton from '../components/StandardButton';
 
-const Start = () => {
+export default Start = () => {
   const navigation = useNavigation();
   let nickname = null;
 
@@ -24,20 +25,44 @@ const Start = () => {
     });
   }, []);
 
-  return (
-    <Button
-      title="Aloita"
-      onPress={() => navigate()}
-    />
-  );
-
-  function navigate() {
+  const navigate = () => {
     if (nickname) {
       navigation.navigate('Home', { nickname: nickname })
     } else {
       navigation.navigate('Nickname')
     }
   }
+
+  return (
+    <ImageBackground
+        source={require('../assets/tietoviisas-on-screen.png')}
+        style={styles.backgroundImage}
+    >
+      <Text style={styles.text}>TIETOVIISAS</Text>
+      <StandardButton
+        text={"Aloita"}
+        onPress={navigate}
+        buttonStyles={styles.aloitaButton}
+      />
+    </ImageBackground>
+  );
 };
 
-export default Start;
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center'
+  },
+  aloitaButton: {
+    bottom: 40,
+    left: 20,
+    right: 20,
+  },
+  text: {
+    color: 'white',
+    fontSize: 32,
+    textAlign: 'center',
+    top: 110
+  },
+});
