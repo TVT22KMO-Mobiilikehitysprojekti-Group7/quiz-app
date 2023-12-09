@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+// endgame.js
+
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { saveScore } from '../data/score';
@@ -21,21 +23,26 @@ const Endgame = ({ route }) => {
   const navigation = useNavigation();
   const { score } = route.params;
   const feedback = getFeedback(score);
+  const [gameDate, setGameDate] = useState(null);
 
   useEffect(() => {
-    saveScore(score);
+    const currentDate = new Date();
+    setGameDate(currentDate);
+    saveScore({ score, date: new Date() });  // Lisätty päivämäärä tallennukseen
   }, []);
 
   return (
     <View>
-      <Text>Peli päättyi</Text>
+      <Text>Game Over</Text>
       <Text>
-        Pisteesi: {score}
+        Your Score: {score}
         {"\n"}
-        Palautteesi: {feedback}
+        Feedback: {feedback}
+        {"\n"}
+        Date: {gameDate?.toLocaleDateString()}
       </Text>
       <Button
-        title="Palaa päävalikkoon"
+        title="Back to Main Menu"
         onPress={() => navigation.navigate('Home')}
       />
     </View>
