@@ -1,5 +1,5 @@
 // endgame.js
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +19,7 @@ const getFeedback = (score) => {
   }
 };
 
+
 const Endgame = ({ route }) => {
   const navigation = useNavigation();
   const { score } = route.params;
@@ -26,11 +27,21 @@ const Endgame = ({ route }) => {
   const [gameDate, setGameDate] = useState(null);
 
   useEffect(() => {
-    const currentDate = new Date();
-    setGameDate(currentDate);
-    saveScore({ score, date: new Date() });  // Lisätty päivämäärä tallennukseen
+    const saveGameResult = async () => {
+      const getNickname = async () => {
+        const storedNickname = await AsyncStorage.getItem('nickname');
+        return storedNickname;
+      };
+  
+      const playerNickname = await getNickname();
+      const currentDate = new Date();
+      setGameDate(currentDate);
+      saveScore({ playerNickname, score, date: currentDate });
+    };
+  
+    saveGameResult();
   }, []);
-
+  
   return (
     <View>
       <Text>Game Over</Text>
@@ -50,3 +61,4 @@ const Endgame = ({ route }) => {
 };
 
 export default Endgame;
+
