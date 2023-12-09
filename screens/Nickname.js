@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Alert, ToastAndroid } from 'react-native';
+import { TextInput, Alert, ToastAndroid, StyleSheet, ImageBackground, Dimensions } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { resetLocalScores } from '../data/score';
 
-const Nickname = () => {
+export default Nickname = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const [nickname, setNickname] = useState(route.params?.nickname);
@@ -73,18 +73,50 @@ const Nickname = () => {
   }
 
   return (
-    <View>
+    <ImageBackground
+        source={require('../assets/tietoviisas-on-screen.png')}
+        style={styles.backgroundImage}
+    >
       <TextInput
+        label="Nimimerkki"
         placeholder="Syötä pelaajan nimi"
+        placeholderTextColor='white'
+        underlineColorAndroid='white'
         value={nickname}
         onChangeText={setNickname}
+        style={styles.nicknameText}
       />
-      <Button
-        title="Valmis"
-        onPress={() => setNicknameAndNavigate()}
+      <StandardButton
+        text={"Valmis"}
+        onPress={setNicknameAndNavigate}
+        buttonStyles={styles.valmisButton}
       />
-    </View>
+    </ImageBackground>
   );
 };
 
-export default Nickname;
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+  },
+  nicknameText: {
+    position: 'absolute',
+    color: 'white',
+    height: 40,
+    margin: 10,
+    padding: 10,
+    bottom: 200,
+    left: 10,
+    right: 10,
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  valmisButton: {
+    bottom: 40,
+    left: 20,
+    right: 20,
+  }
+});
