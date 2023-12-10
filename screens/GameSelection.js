@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Button, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity, Text, ImageBackground, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { fetchQuestionsFromMultipleCategories } from '../data/dataService';
 import { storeQuestionsInStorage } from '../data/dataService';
+import StandardButton from '../components/StandardButton';
 
 const GameSelection = () => {
   const navigation = useNavigation();
@@ -41,25 +42,56 @@ const GameSelection = () => {
   };
 
   return (
-    <ScrollView>
+    <ImageBackground
+        source={require('../assets/tietoviisas-on-screen.png')}
+        style={styles.backgroundImage}
+    >
       <View>
         {categories.map((category, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => toggleCategorySelection(category)}
+            onPress={() => toggleCategorySelection(category)} 
             style={{ 
-              margin: 10, padding: 10, 
+              margin: 15, padding: 10, 
               backgroundColor: selectedCategories.includes(category) ? 'lightblue' : 'lightgray', 
-              borderRadius: 5 
+              borderRadius: 10, 
             }}
           >
             <Text>{category}</Text>
           </TouchableOpacity>
         ))}
-        <Button title="Aloita peli" onPress={startGame} />
-        <Button title="Takaisin" onPress={() => navigation.goBack()} />
+        
+        <StandardButton 
+        text={"Aloita peli"}
+        onPress={startGame}
+        buttonStyles={styles.aloitaButton} 
+        />
+        <StandardButton 
+        text={"Takaisin"}
+        onPress={() => navigation.goBack()}
+        buttonStyles={styles.takaisinButton}
+         />
       </View>
-    </ScrollView>
+    </ImageBackground>
   );
 };
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center'
+  },
+  aloitaButton: {
+    bottom: -80,
+    left: 20,
+    right: 20,
+  },
+  takaisinButton: {
+    bottom: -150,
+    left: 20,
+    right: 20,
+  },
+});
+
 export default GameSelection;

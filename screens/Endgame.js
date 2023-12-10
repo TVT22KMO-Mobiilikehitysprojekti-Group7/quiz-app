@@ -1,9 +1,10 @@
 // endgame.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button , ImageBackground, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { saveScore } from '../data/score';
+import StandardButton from '../components/StandardButton';
 
 const getFeedback = (score) => {
   if (score < 3000) {
@@ -43,22 +44,47 @@ const Endgame = ({ route }) => {
   }, []);
   
   return (
+    <ImageBackground
+      source={require('../assets/tietoviisas-on-screen.png')}
+      style={styles.backgroundImage}
+    >
     <View>
-      <Text>Game Over</Text>
-      <Text>
-        Your Score: {score}
+      <Text style={styles.text}>Peli päättyi</Text>
+      <Text style={styles.text}>
+        Pisteesi: {score}
         {"\n"}
-        Feedback: {feedback}
+        Palaute: {feedback}
         {"\n"}
-        Date: {gameDate?.toLocaleDateString()}
+        Päivänmäärä: {gameDate?.toLocaleDateString()}
       </Text>
-      <Button
-        title="Back to Main Menu"
+      <StandardButton
+        text={"Palaa päävalikkoon"}
         onPress={() => navigation.navigate('Home')}
+        buttonStyles={styles.kotiButton}
       />
     </View>
+    </ImageBackground>
   );
 };
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center'
+  },
+  kotiButton: {
+    bottom: -260,
+    left: 20,
+    right: 20,
+  },
+  text: {
+    color: 'white',
+    fontSize: 32,
+    textAlign: 'center',
+    top: 170
+  },
+});
 
 export default Endgame;
 
