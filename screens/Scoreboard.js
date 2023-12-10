@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, FlatList, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { fetchFirebaseScores, getLocalScores } from '../data/score'; // Import the new functions
+import StandardButton from '../components/StandardButton';
 
 const Scoreboard = () => {
   const navigation = useNavigation();
@@ -92,7 +93,11 @@ const Scoreboard = () => {
           )}
           keyExtractor={(item, index) => index.toString()}
         />
-        <Button title="Takaisin" onPress={() => navigation.goBack()} />
+        <StandardButton 
+        text={"Takaisin"}
+        onPress={() => navigation.goBack()}
+        buttonStyles={styles.takaisinButton}
+         />
       </View>
     </ImageBackground>
   );
@@ -114,6 +119,7 @@ const styles = {
     fontWeight: 'bold',
     marginBottom: 10,
     color: 'white',
+    textAlign: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -129,6 +135,11 @@ const styles = {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 5,
+  },
+  takaisinButton: {
+    bottom: 10,
+    left: 20,
+    right: 20,
   },
 };
 
