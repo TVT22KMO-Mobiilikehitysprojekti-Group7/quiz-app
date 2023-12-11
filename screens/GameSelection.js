@@ -35,10 +35,15 @@ const GameSelection = () => {
       alert('Valitse vähintään yksi kategoria');
       return;
     }
-
+  
+    // Käytä valittuja kategorioita kysymysten hakemiseen
     const questions = await fetchQuestionsFromMultipleCategories(selectedCategories);
     await storeQuestionsInStorage('mixed', questions);
-    navigation.navigate('Game', { category: 'mixed' });
+    navigation.navigate('Game', { 
+      category: 'mixed',
+      questions: questions, 
+      multiplier: selectedCategories.length // Lisätty pistekerroin
+    });
   };
 
   return (
