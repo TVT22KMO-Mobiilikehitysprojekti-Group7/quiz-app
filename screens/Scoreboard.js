@@ -1,19 +1,23 @@
 // Scoreboard.js
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
+import { View, Text, ImageBackground, Dimensions, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { fetchFirebaseScores, getLocalScores } from '../data/score'; // Import the new functions
+import StandardButton from '../components/StandardButton';
+import ModalSelector from 'react-native-modal-selector';
 
 const Scoreboard = () => {
   const navigation = useNavigation();
   const [localScores, setLocalScores] = useState([]);
   const [firebaseScores, setFirebaseScores] = useState([]);
-  const [showAllScores, setShowAllScores] = useState(true);
+  const [selectedList, setSelectedList] = useState('Tänään');
+  const [showAllLocalScores, setShowAllLocalScores] = useState(false);
 
   useEffect(() => {
     const loadScores = async () => {
       const localScoresData = await getLocalScores();
+
       setLocalScores(localScoresData);
 
       try {
@@ -28,23 +32,36 @@ const Scoreboard = () => {
     loadScores();
   }, []);
 
-  const handleTop10Press = async () => {
-    try {
-      const newFirebaseScores = await fetchFirebaseScores();
-      setFirebaseScores(newFirebaseScores);
-      setShowAllScores(false); // Show Top10
-    } catch (error) {
-      console.error('Error fetching scores from Firebase:', error);
-      setFirebaseScores([]); // Handle the error by setting an empty array or a default value
-    }
-  };
-
   const sortedScores = (source) =>
     source && source.length > 0 ? source.sort((a, b) => b.score - a.score) : [];
 
-  const scoresToDisplay = showAllScores
-    ? (localScores?.length > 0 ? sortedScores(localScores) : [])
-    : sortedScores(firebaseScores);
+  const todayScores = localScores.filter(item => {
+    const currentDate = new Date().toLocaleDateString();
+    const scoreDate = new Date(item.date).toLocaleDateString();
+    return scoreDate === currentDate;
+  });
+
+  const allLocalScoresList = sortedScores(localScores);
+  const top10ScoresList = sortedScores(firebaseScores);
+
+  const renderScoreList = () => {
+    switch (selectedList) {
+      case 'today':
+        return todayScores;
+      case 'top10':
+        return top10ScoresList;
+      case 'allLocal':
+        return allLocalScoresList;
+      default:
+        return [];
+    }
+  };
+
+  const data = [
+    { key: 'today', label: 'Tänään' },
+    { key: 'top10', label: 'Top 10' },
+    { key: 'allLocal', label: 'Kaikki' },
+  ];
 
   return (
     <ImageBackground
@@ -53,37 +70,18 @@ const Scoreboard = () => {
     >
       <View style={styles.container}>
         <Text style={styles.title}>Scoreboard</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              { backgroundColor: showAllScores ? '#ccc' : '#fff' },
-            ]}
-            onPress={() => setShowAllScores(false)}
-          >
-            <Text>Kaikki</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              { backgroundColor: showAllScores ? '#fff' : '#ccc' },
-            ]}
-            onPress={() => setShowAllScores(true)}
-          >
-            <Text>Tänään</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              { backgroundColor: showAllScores ? '#fff' : '#ccc' },
-            ]}
-            onPress={handleTop10Press}
-          >
-            <Text>Top10</Text>
-          </TouchableOpacity>
-        </View>
+
+        <ModalSelector
+          data={data}
+          initValue={selectedList}
+          onChange={(option) => setSelectedList(option.key)}
+          style={styles.picker}
+          selectTextStyle={styles.pickerText}
+          cancelText="Peruuta"
+        />
+
         <FlatList
-          data={scoresToDisplay}
+          data={renderScoreList()}
           renderItem={({ item }) => (
             <View style={styles.scoreItem}>
               <Text>Player: {item.playerNickname}</Text>
@@ -92,7 +90,12 @@ const Scoreboard = () => {
           )}
           keyExtractor={(item, index) => index.toString()}
         />
-        <Button title="Takaisin" onPress={() => navigation.goBack()} />
+
+        <StandardButton
+          text={'Takaisin'}
+          onPress={() => navigation.goBack()}
+          buttonStyles={styles.takaisinButton}
+        />
       </View>
     </ImageBackground>
   );
@@ -108,27 +111,34 @@ const styles = {
   container: {
     flex: 1,
     padding: 20,
+    justifyContent: 'flex-end', // Align content to the bottom of the container
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
     color: 'white',
+    textAlign: 'center',
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 10,
-  },
-  button: {
-    padding: 10,
+  picker: {
+    height: 50,
+    marginBottom: 20,
+    backgroundColor: 'white', // Set the background color to white
     borderRadius: 5,
+    paddingLeft: 10,
+  },
+  pickerText: {
+    fontSize: 16,
+    color: 'white',
   },
   scoreItem: {
     marginBottom: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 10,
     borderRadius: 5,
+  },
+  takaisinButton: {
+    marginVertical: 20, // Adjust the vertical margin as needed
   },
 };
 
