@@ -1,7 +1,7 @@
 // game.js
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { loadQuestionsFromStorage } from '../data/dataService';
 import { saveScore } from '../data/score';
@@ -108,22 +108,35 @@ const Game = ({ route }) => {
   }
 
   return (
+    <ImageBackground
+        source={require('../assets/tietoviisas-on-screen.png')}
+        style={styles.backgroundImage}
+    >
     <View>
-      <Text style={{ fontSize: 24 }}>Score: {score}</Text>
-      <Text style={{ fontSize: 20 }}>Question {questionsAnswered + 1} / 10</Text>
-      <Text>{loadedQuestions[currentQuestionIndex]?.Kysymys}</Text>
+      <Text style={{ fontSize: 24, color: 'white', bottom: -220, fontWeight: 'bold' }}>Score: {score}</Text>
+      <Text style={{ fontSize: 20, color: 'white', bottom: -220, fontWeight: 'bold' }}>Question {questionsAnswered + 1} / 10</Text>
+      <Text style={{ fontSize: 20, color: 'white', bottom: -220, fontWeight: 'bold' }}>{loadedQuestions[currentQuestionIndex]?.Kysymys}</Text>
       {loadedQuestions[currentQuestionIndex]?.Vaihtoehdot.map((option, idx) => (
         <TouchableOpacity
           disabled={!canAnswer}
           key={idx}
           onPress={() => handleAnswerQuestion(option)}
-          style={{ margin: 10, padding: 10, backgroundColor: 'lightgray', borderRadius: 5 }}
+          style={{ margin: 10, padding: 10, backgroundColor: 'lightgray', borderRadius: 5, bottom: -220 }}
         >
           <Text>{option}</Text>
         </TouchableOpacity>
       ))}
     </View>
+    </ImageBackground>
   );
 };
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center'
+  },
+});
 
 export default Game;

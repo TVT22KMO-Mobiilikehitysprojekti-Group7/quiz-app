@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ImageBackground, Dimensions, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { fetchFirebaseScores, getLocalScores } from '../data/score'; // Import the new functions
+import { fetchFirebaseScores, getLocalScores } from '../data/score';
 import StandardButton from '../components/StandardButton';
 import ModalSelector from 'react-native-modal-selector';
+
 
 const Scoreboard = () => {
   const navigation = useNavigation();
@@ -91,11 +92,13 @@ const Scoreboard = () => {
           keyExtractor={(item, index) => index.toString()}
         />
 
+
         <StandardButton
           text={'Takaisin'}
           onPress={() => navigation.goBack()}
           buttonStyles={styles.takaisinButton}
         />
+
       </View>
     </ImageBackground>
   );
