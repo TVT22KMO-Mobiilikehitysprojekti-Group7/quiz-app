@@ -8,7 +8,7 @@ import { saveScore } from '../data/score';
 
 const Game = ({ route }) => {
   const navigation = useNavigation();
-  const { category } = route.params;
+  const { category, questions: loadedQuestionsFromRoute, multiplier = 1 } = route.params; 
   const [loadedQuestions, setLoadedQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(1000);
@@ -60,12 +60,14 @@ const Game = ({ route }) => {
     const correctAnswer = currentQuestion.Vastaus;
   
     if (option === correctAnswer) {
-      let newScore = score + 1000;
-      setQuestionsAnswered(questionsAnswered + 1);
+      let pointsToAdd = 1000 * multiplier; // Käytä pistekerrointa
+      let newScore = score + pointsToAdd; 
+      setScore(newScore); 
+      setQuestionsAnswered(questionsAnswered + 0.05);
   
       if (questionsAnswered + 1 >= 10) {
         // Tallenna pistemäärä pelin päättyessä
-        saveScore({ score: newScore });
+        saveScore(newScore);
         navigation.navigate('Endgame', { score: newScore });
       } else {
         setScore(newScore);
