@@ -11,7 +11,7 @@ export default Settings = () => {
       source={require('../assets/tietoviisas-on-screen.png')}
       style={styles.backgroundImage}
     >
-        <Text style={styles.text}>ASETUKSET</Text>
+        <Text style={styles.text}>Asetukset</Text>
         <StandardButton
           text={"Äänet"}
           onPress={() => toggleSounds()}
@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 32,
     textAlign: 'center',
-    top: 110
+    top: 120
   },
 });

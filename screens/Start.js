@@ -35,10 +35,10 @@ export default Start = () => {
 
   return (
     <ImageBackground
-        source={require('../assets/tietoviisas-on-screen.png')}
+        source={require('../assets/tietoviisas.png')}
         style={styles.backgroundImage}
     >
-      <Text style={styles.text}>TIETOVIISAS</Text>
+      <Text style={styles.text}></Text>
       <StandardButton
         text={"Aloita"}
         onPress={navigate}
