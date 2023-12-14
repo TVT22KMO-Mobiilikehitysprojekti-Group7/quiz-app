@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     color: 'lightgreen',
     fontSize: 28,
     textAlign: 'center',
-    top: 110
+    top: 120
   },
   buttonPelaa: {
     bottom: 180,
