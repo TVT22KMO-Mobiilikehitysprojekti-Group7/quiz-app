@@ -1,6 +1,4 @@
-// game.js
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { loadQuestionsFromStorage } from '../data/dataService';
@@ -17,6 +15,9 @@ const Game = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const [canAnswer, setCanAnswer] = useState(false);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [correctOption, setCorrectOption] = useState(null);
+  const scoringIntervalRef = useRef(null);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -55,26 +56,32 @@ const Game = ({ route }) => {
 
   const handleAnswerQuestion = (option) => {
     setCanAnswer(false);
-    clearInterval(scoringTimer);
+    clearTimeout(delayTimer);
+    clearInterval(scoringIntervalRef.current);
+
     const currentQuestion = loadedQuestions[currentQuestionIndex];
     const correctAnswer = currentQuestion.Vastaus;
+  
+    setSelectedOption(option);
+    setCorrectOption(correctAnswer);
   
     if (option === correctAnswer) {
       let pointsToAdd = 1000 + (1000 * 0.01 * (multiplier - 1));
       let newScore = score + pointsToAdd;
       setScore(newScore); 
       setQuestionsAnswered(prev => prev + 1);
-  
       if (questionsAnswered >= 9) {
         saveScore(newScore);
         navigation.navigate('Endgame', { score: newScore });
       } else {
-        Alert.alert('Correct Answer', 'Well done!', [{ text: 'OK', onPress: () => nextQuestion() }]);
+        setTimeout(() => {
+          nextQuestion();
+        }, 1000);
       }
     } else {
-      Alert.alert('Wrong Answer', `The correct answer was: ${correctAnswer}`, [
-        { text: 'OK', onPress: () => navigation.navigate('Endgame', { score }) },
-      ]);
+      setTimeout(() => {
+        navigation.navigate('Endgame', { score });
+      }, 1000);
     }
   };
   
@@ -82,6 +89,8 @@ const Game = ({ route }) => {
   const nextQuestion = () => {
     const newLoadedQuestions = loadedQuestions.filter((_, index) => index !== currentQuestionIndex);
     setLoadedQuestions(newLoadedQuestions);
+    setSelectedOption(null);
+    setCorrectOption(null);
   
     if (newLoadedQuestions.length > 0) {
       const nextQuestionIndex = Math.floor(Math.random() * newLoadedQuestions.length);
@@ -95,17 +104,16 @@ const Game = ({ route }) => {
   const setTimers = () => {
     const delayTimer = setTimeout(() => {
       setCanAnswer(true);
-      const timer = setInterval(() => {
+      scoringIntervalRef.current = setInterval(() => {
         setScore((prevScore) => {
           const newScore = prevScore > 0 ? prevScore - 1 : 0;
           if (newScore <= 0) {
-            clearInterval(timer);
+            clearInterval(scoringIntervalRef.current);
             navigation.navigate('Endgame', { score: 0 });
           }
           return newScore;
         });
       }, 25);
-      setScoringTimer(timer);
     }, 2000);
     setDelayTimer(delayTimer);
   };
@@ -124,15 +132,30 @@ const Game = ({ route }) => {
       <Text style={{ fontSize: 20, color: 'white', bottom: -220, fontWeight: 'bold' }}>Question {questionsAnswered + 1} / 10</Text>
       <Text style={{ fontSize: 20, color: 'white', bottom: -220, fontWeight: 'bold' }}>{loadedQuestions[currentQuestionIndex]?.Kysymys}</Text>
       {loadedQuestions[currentQuestionIndex]?.Vaihtoehdot.map((option, idx) => (
-        <TouchableOpacity
-          disabled={!canAnswer}
-          key={idx}
-          onPress={() => handleAnswerQuestion(option)}
-          style={{ margin: 10, padding: 10, backgroundColor: 'lightgray', borderRadius: 5, bottom: -220 }}
-        >
-          <Text>{option}</Text>
-        </TouchableOpacity>
-      ))}
+      <TouchableOpacity
+        disabled={!canAnswer}
+        key={idx}
+        onPress={() => handleAnswerQuestion(option)}
+        style={{
+          margin: 10,
+          padding: 10,
+          backgroundColor:
+            selectedOption === option
+              ? option === correctOption
+                ? 'green' // Correct answer selected
+                : 'red' // Incorrect answer selected
+              : option === correctOption
+              ? 'green' // Correct answer not selected
+              : 'lightgray',
+          borderRadius: 5,
+          bottom: -220,
+        }}
+      >
+        <Text style={{ color: selectedOption === option ? 'white' : 'black' }}>
+          {option}
+        </Text>
+      </TouchableOpacity>
+    ))}
     </View>
     </ImageBackground>
   );
