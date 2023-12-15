@@ -60,26 +60,24 @@ const Game = ({ route }) => {
     const correctAnswer = currentQuestion.Vastaus;
   
     if (option === correctAnswer) {
-      let pointsToAdd = 1000 * multiplier; // Käytä pistekerrointa
-      let newScore = score + pointsToAdd; 
+      let pointsToAdd = 1000 + (1000 * 0.01 * (multiplier - 1));
+      let newScore = score + pointsToAdd;
       setScore(newScore); 
-      setQuestionsAnswered(questionsAnswered + 0.05);
+      setQuestionsAnswered(prev => prev + 1);
   
-      if (questionsAnswered + 1 >= 10) {
-        // Tallenna pistemäärä pelin päättyessä
+      if (questionsAnswered >= 9) {
         saveScore(newScore);
         navigation.navigate('Endgame', { score: newScore });
       } else {
-        setScore(newScore);
         Alert.alert('Correct Answer', 'Well done!', [{ text: 'OK', onPress: () => nextQuestion() }]);
       }
     } else {
-      // Jos vastaus on väärin, näytä ilmoitus ja navigoi Endgameen
       Alert.alert('Wrong Answer', `The correct answer was: ${correctAnswer}`, [
         { text: 'OK', onPress: () => navigation.navigate('Endgame', { score }) },
       ]);
     }
   };
+  
 
   const nextQuestion = () => {
     const newLoadedQuestions = loadedQuestions.filter((_, index) => index !== currentQuestionIndex);
@@ -98,12 +96,19 @@ const Game = ({ route }) => {
     const delayTimer = setTimeout(() => {
       setCanAnswer(true);
       const timer = setInterval(() => {
-        setScore((prevScore) => (prevScore > 0 ? prevScore - 1 : 0));
+        setScore((prevScore) => {
+          const newScore = prevScore > 0 ? prevScore - 1 : 0;
+          if (newScore <= 0) {
+            clearInterval(timer);
+            navigation.navigate('Endgame', { score: 0 });
+          }
+          return newScore;
+        });
       }, 25);
       setScoringTimer(timer);
     }, 2000);
     setDelayTimer(delayTimer);
-  }
+  };
 
   if (loading) {
     return <Text>Loading questions...</Text>;
