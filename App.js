@@ -12,6 +12,7 @@ import { preloadQuestionsForAllCategories } from './data/dataService';
 import Scoreboard from './screens/Scoreboard';
 import Endgame from './screens/Endgame';
 import { useBackgroundMusic } from './components/Sound';
+import { BackHandler } from 'react-native';
 
 const Stack = createStackNavigator();
 
@@ -27,8 +28,11 @@ const App = () => {
 
     loadMusic();
 
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true); // Disable hardware back button
+
     return () => {
       backgroundMusic?.unloadAsync(); // Vapauta musiikin resurssit
+      backHandler.remove();
     };
   }, []);
   return (
