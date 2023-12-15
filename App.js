@@ -11,14 +11,26 @@ import Game from './screens/Game';
 import { preloadQuestionsForAllCategories } from './data/dataService';
 import Scoreboard from './screens/Scoreboard';
 import Endgame from './screens/Endgame';
+import { useBackgroundMusic } from './components/Sound';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   useEffect(() => {
     preloadQuestionsForAllCategories(); // Lataa kysymykset käynnistyessä
-  }, []);
 
+    let backgroundMusic;
+
+    const loadMusic = async () => {
+      backgroundMusic = await useBackgroundMusic();
+    };
+
+    loadMusic();
+
+    return () => {
+      backgroundMusic?.unloadAsync(); // Vapauta musiikin resurssit
+    };
+  }, []);
   return (
     <>
       <StatusBar hidden={true} />
