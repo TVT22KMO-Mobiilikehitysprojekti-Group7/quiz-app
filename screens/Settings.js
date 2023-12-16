@@ -2,19 +2,21 @@ import React from 'react';
 import { Text, ImageBackground, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import StandardButton from '../components/StandardButton';
+import { useAudio } from '../components/AudioContext';
 
 export default Settings = () => {
-    const navigation = useNavigation();
-  
-    return (
-      <ImageBackground
+  const navigation = useNavigation();
+  const { isMusicPlaying, toggleMusic } = useAudio();
+
+  return (
+    <ImageBackground
       source={require('../assets/tietoviisas-on-screen.png')}
       style={styles.backgroundImage}
     >
-        <Text style={styles.text}>Asetukset</Text>
+      <Text style={styles.text}>Asetukset</Text>
         <StandardButton
-          text={"Äänet"}
-          onPress={() => toggleSounds()}
+          text={isMusicPlaying ? "Taustamusiikki päällä" : "Taustamusiikki pois"}
+          onPress={toggleMusic}
           buttonStyles={styles.buttonÄänet}
         />
         <StandardButton
@@ -29,11 +31,6 @@ export default Settings = () => {
         />
       </ImageBackground>
     );
-
-    function toggleSounds() {
-        
-    }
-   
 };
 
 const styles = StyleSheet.create({

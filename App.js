@@ -11,32 +11,24 @@ import Game from './screens/Game';
 import { preloadQuestionsForAllCategories } from './data/dataService';
 import Scoreboard from './screens/Scoreboard';
 import Endgame from './screens/Endgame';
-import { useBackgroundMusic } from './components/Sound';
 import { BackHandler } from 'react-native';
-
+import { AudioProvider } from './components/AudioContext';
 const Stack = createStackNavigator();
 
 const App = () => {
   useEffect(() => {
     preloadQuestionsForAllCategories(); // Lataa kysymykset käynnistyessä
 
-    let backgroundMusic;
-
-    const loadMusic = async () => {
-      backgroundMusic = await useBackgroundMusic();
-    };
-
-    loadMusic();
-
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true); // Disable hardware back button
 
     return () => {
-      backgroundMusic?.unloadAsync(); // Vapauta musiikin resurssit
       backHandler.remove();
     };
   }, []);
+
   return (
     <>
+    <AudioProvider>
       <StatusBar hidden={true} />
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Start">
@@ -50,6 +42,7 @@ const App = () => {
         <Stack.Screen name="Endgame" component={Endgame} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
+      </AudioProvider>
     </>
   );
 };
