@@ -137,8 +137,8 @@ const Game = ({ route }) => {
         key={idx}
         onPress={() => handleAnswerQuestion(option)}
         style={{
-          margin: 10,
-          padding: 10,
+          margin: 2,
+          padding: 5,
           backgroundColor:
             selectedOption === option
               ? option === correctOption
@@ -170,5 +170,4 @@ const styles = StyleSheet.create({
 });
 
 export default Game;
-
 
