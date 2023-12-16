@@ -22,27 +22,32 @@ const Game = ({ route }) => {
   useEffect(() => {
     const fetchQuestions = async () => {
       let categoriesArray = Array.isArray(category) ? category : [category];
-  
       let questionsFromAllCategories = [];
-  
       for (let cat of categoriesArray) {
         const questions = await loadQuestionsFromStorage(cat);
         questionsFromAllCategories = [...questionsFromAllCategories, ...questions];
       }
-  
       const shuffledQuestions = shuffleArray(questionsFromAllCategories);
       setLoadedQuestions(shuffledQuestions);
       setLoading(false);
     };
-  
     fetchQuestions();
   }, [category]);
-  
+
   useEffect(() => {
     setTimers();
-    // Clear the scoring timer when the component unmounts
-    return () => clearInterval(delayTimer);
+    return () => {
+      clearInterval(scoringIntervalRef.current);
+    };
   }, []);
+
+  useEffect(() => {
+    if (score <= 0) {
+      navigation.navigate('Endgame', { score: 0 });
+    } else if (questionsAnswered >= 10) {
+      navigation.navigate('Endgame', { score });
+    }
+  }, [score, questionsAnswered, navigation]);
 
   const shuffleArray = (array) => {
     let currentIndex = array.length, randomIndex;
@@ -102,20 +107,13 @@ const Game = ({ route }) => {
   };
 
   const setTimers = () => {
-    const delayTimer = setTimeout(() => {
+    const timer = setTimeout(() => {
       setCanAnswer(true);
       scoringIntervalRef.current = setInterval(() => {
-        setScore((prevScore) => {
-          const newScore = prevScore > 0 ? prevScore - 1 : 0;
-          if (newScore <= 0) {
-            clearInterval(scoringIntervalRef.current);
-            navigation.navigate('Endgame', { score: 0 });
-          }
-          return newScore;
-        });
+        setScore(prevScore => prevScore > 0 ? prevScore - 1 : 0);
       }, 25);
     }, 2000);
-    setDelayTimer(delayTimer);
+    return () => clearTimeout(timer);
   };
 
   if (loading) {
