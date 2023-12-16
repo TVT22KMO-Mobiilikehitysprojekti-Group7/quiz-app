@@ -1,32 +1,40 @@
 // Scoreboard.js
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, ImageBackground, Dimensions, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  ImageBackground,
+  Dimensions,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator, // Added import for ActivityIndicator
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { fetchFirebaseScores, getLocalScores } from '../data/score';
-import StandardButton from '../components/StandardButton';
-import ModalSelector from 'react-native-modal-selector';
-
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Scoreboard = () => {
   const navigation = useNavigation();
   const [localScores, setLocalScores] = useState([]);
   const [firebaseScores, setFirebaseScores] = useState([]);
-  const [selectedList, setSelectedList] = useState('Tänään');
-  const [showAllLocalScores, setShowAllLocalScores] = useState(false);
+  const [selectedList, setSelectedList] = useState('top10');
+  const [loading, setLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     const loadScores = async () => {
-      const localScoresData = await getLocalScores();
-
-      setLocalScores(localScoresData);
-
       try {
+        const localScoresData = await getLocalScores();
+        setLocalScores(localScoresData);
+
         const firebaseScoresData = await fetchFirebaseScores();
         setFirebaseScores(firebaseScoresData);
+
+        setLoading(false); // Set loading to false when scores are loaded
       } catch (error) {
-        console.error('Error fetching scores from Firebase:', error);
-        setFirebaseScores([]); // Handle the error by setting an empty array or a default value
+        console.error('Error fetching scores:', error);
+        setFirebaseScores([]);
+        setLoading(false); // Set loading to false on error as well
       }
     };
 
@@ -36,7 +44,7 @@ const Scoreboard = () => {
   const sortedScores = (source) =>
     source && source.length > 0 ? source.sort((a, b) => b.score - a.score) : [];
 
-  const todayScores = localScores.filter(item => {
+  const todayScores = localScores.filter((item) => {
     const currentDate = new Date().toLocaleDateString();
     const scoreDate = new Date(item.date).toLocaleDateString();
     return scoreDate === currentDate;
@@ -64,42 +72,68 @@ const Scoreboard = () => {
     { key: 'allLocal', label: 'Kaikki' },
   ];
 
+  const renderCategoryButton = (categoryKey, label) => (
+    <TouchableOpacity
+      key={categoryKey}
+      style={{ ...styles.categoryButton, ...styles.button }} // Combine styles
+      onPress={() => setSelectedList(categoryKey)}
+      activeOpacity={0}
+    >
+      <LinearGradient
+        colors={['orange', 'purple']}
+        style={{ borderRadius: 2, padding: 2, width: 80, height: 30 }} // Adjust dimensions as needed
+      >
+        <Text style={styles.categoryButtonText}>{label}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+
   return (
     <ImageBackground
       source={require('../assets/tietoviisas-on-screen.png')}
       style={styles.backgroundImage}
     >
-      <View style={styles.container}>
-        <Text style={styles.title}>Scoreboard</Text>
+      {loading ? ( // Display loading screen or indicator
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      ) : (
+        // Render the scoreboard content
+        <View style={styles.container}>
+          <Text style={styles.title}>Scoreboard</Text>
 
-        <ModalSelector
-          data={data}
-          initValue={selectedList}
-          onChange={(option) => setSelectedList(option.key)}
-          style={styles.picker}
-          selectTextStyle={styles.pickerText}
-          cancelText="Peruuta"
-        />
+          {/* Render category buttons */}
+          <View style={styles.categoryButtonsContainer}>
+            {data.map((category) =>
+              renderCategoryButton(category.key, category.label)
+            )}
+          </View>
 
-        <FlatList
-          data={renderScoreList()}
-          renderItem={({ item }) => (
-            <View style={styles.scoreItem}>
-              <Text>Player: {item.playerNickname}</Text>
-              <Text>Score: {item.score}</Text>
-            </View>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
+          <FlatList
+            data={renderScoreList()}
+            renderItem={({ item }) => (
+              <View style={styles.scoreItem}>
+                <Text>Player: {item.playerNickname}</Text>
+                <Text>Score: {item.score}</Text>
+              </View>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+          />
 
-
-        <StandardButton
-          text={'Takaisin'}
-          onPress={() => navigation.goBack()}
-          buttonStyles={styles.takaisinButton}
-        />
-
-      </View>
+          {/* Updated "Takaisin" button styling */}
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.takaisinButton}
+          >
+            <LinearGradient
+              colors={['orange', 'purple']}
+              style={{ borderRadius: 10, padding: 10 }}
+            >
+              <Text style={styles.buttonText}>Takaisin</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      )}
     </ImageBackground>
   );
 };
@@ -114,7 +148,7 @@ const styles = {
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'flex-end', // Align content to the bottom of the container
+    justifyContent: 'flex-end',
   },
   title: {
     fontSize: 24,
@@ -123,16 +157,20 @@ const styles = {
     color: 'white',
     textAlign: 'center',
   },
-  picker: {
-    height: 50,
-    marginBottom: 20,
-    backgroundColor: 'white', // Set the background color to white
-    borderRadius: 5,
-    paddingLeft: 10,
+  categoryButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
   },
-  pickerText: {
+  categoryButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 0,
+    borderRadius: 10,
+  },
+  categoryButtonText: {
     fontSize: 16,
-    color: 'white',
+    color: 'black',
+    textAlign: 'center',
   },
   scoreItem: {
     marginBottom: 10,
@@ -140,8 +178,24 @@ const styles = {
     padding: 10,
     borderRadius: 5,
   },
+  // Updated "Takaisin" button styling
   takaisinButton: {
-    marginVertical: 20, // Adjust the vertical margin as needed
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 0,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: 'black',
+    fontSize: 25,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  // Loading screen styles
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 };
 
