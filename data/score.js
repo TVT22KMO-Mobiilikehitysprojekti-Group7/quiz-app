@@ -1,20 +1,10 @@
 // score.js
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import db from './Firebase';
+import { collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
 
-// Replace 'YourFirebaseConfig' with your actual Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyB-Nqj5ifCVjpZ7iNdlFTWufnL5hEvGX50",
-  authDomain: "tietoviisas-fe817.firebaseapp.com",
-  projectId: "tietoviisas-fe817",
-  storageBucket: "tietoviisas-fe817.appspot.com",
-  messagingSenderId: "772589460127",
-  appId: "1:772589460127:web:09a188af8a45088efe60aa"
-};
-
-const app = initializeApp(firebaseConfig);
+const SCORES_COLLECTION = 'Scores';
 
 // Function to save local scores
 export const saveScore = async (score) => {
@@ -37,21 +27,20 @@ export const saveScore = async (score) => {
     await setLocalScores(localScores);
 
     // Save to Firebase
-    const db = getFirestore(app);
-    const scoresCollection = collection(db, 'Scores');
+    const scoresCollection = collection(db, SCORES_COLLECTION);
 
     // Retrieve the player nickname from AsyncStorage
     const playerNickname = await AsyncStorage.getItem('playerNickname');
 
     // Add the new score to Firestore along with the player nickname
-    await addDoc(scoresCollection, { score });
+    await addDoc(scoresCollection, { score, playerNickname });
 
     // Fetch the top 10 scores from Firestore
     const firebaseScores = await fetchFirebaseScores();
 
     console.log("Top 10 scores from Firebase:", firebaseScores);
   } catch (error) {
-    console.error("Error saving score to Firebase:", error);
+    console.error("Error saving score:", error);
   }
 }
 
@@ -88,8 +77,7 @@ export const resetLocalScores = async () => {
 // Function to fetch top scores from Firebase
 export const fetchFirebaseScores = async () => {
   try {
-    const db = getFirestore(app);
-    const scoresCollection = collection(db, 'Scores');
+    const scoresCollection = collection(db, SCORES_COLLECTION);
 
     // Fetch the top 10 scores from Firestore
     const querySnapshot = await getDocs(query(scoresCollection, orderBy('score', 'desc'), limit(10)));

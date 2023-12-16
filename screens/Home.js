@@ -60,20 +60,20 @@ const styles = StyleSheet.create({
     color: 'lightgreen',
     fontSize: 28,
     textAlign: 'center',
-    top: 120
+    top: 110
   },
   buttonPelaa: {
-    bottom: 180,
+    bottom: 150,
     left: 20,
     right: 20,
   },
   buttonPisteet: {
-    bottom: 100,
+    bottom: 80,
     left: 20,
     right: 20,
   },
   buttonAsetukset: {
-    bottom: 20,
+    bottom: 10,
     left: 20,
     right: 20,
   }
