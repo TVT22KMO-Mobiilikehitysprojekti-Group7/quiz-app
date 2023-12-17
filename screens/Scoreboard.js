@@ -100,7 +100,7 @@ const Scoreboard = () => {
       ) : (
         // Render the scoreboard content
         <View style={styles.container}>
-          <Text style={styles.title}>Scoreboard</Text>
+          <Text style={styles.title}>Pistetaulukko</Text>
 
           {/* Render category buttons */}
           <View style={styles.categoryButtonsContainer}>
@@ -113,8 +113,8 @@ const Scoreboard = () => {
             data={renderScoreList()}
             renderItem={({ item }) => (
               <View style={styles.scoreItem}>
-                <Text>Player: {item.playerNickname}</Text>
-                <Text>Score: {item.score}</Text>
+                <Text>Pelaaja: {item.playerNickname}</Text>
+                <Text>Pisteet: {item.score}</Text>
               </View>
             )}
             keyExtractor={(item, index) => index.toString()}
