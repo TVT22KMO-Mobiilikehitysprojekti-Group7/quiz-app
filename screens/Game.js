@@ -119,7 +119,7 @@ const Game = ({ route }) => {
   };
 
   if (loading) {
-    return <Text>Loading questions...</Text>;
+    return <Text>Ladataan kysymykset...</Text>;
   }
 
   return (
@@ -128,8 +128,8 @@ const Game = ({ route }) => {
         style={styles.backgroundImage}
     >
     <View>
-      <Text style={{ fontSize: 24, color: 'white', bottom: -220, fontWeight: 'bold' }}>Score: {score}</Text>
-      <Text style={{ fontSize: 20, color: 'white', bottom: -220, fontWeight: 'bold' }}>Question {questionsAnswered + 1} / 10</Text>
+      <Text style={{ fontSize: 24, color: 'white', bottom: -220, fontWeight: 'bold' }}>Pisteet: {score}</Text>
+      <Text style={{ fontSize: 20, color: 'white', bottom: -220, fontWeight: 'bold' }}>Kysymys {questionsAnswered + 1} / 10</Text>
       <Text style={{ fontSize: 20, color: 'white', bottom: -220, fontWeight: 'bold' }}>{loadedQuestions[currentQuestionIndex]?.Kysymys}</Text>
       {loadedQuestions[currentQuestionIndex]?.Vaihtoehdot.map((option, idx) => (
       <TouchableOpacity

@@ -10,10 +10,9 @@ export default Settings = () => {
 
   return (
     <ImageBackground
-      source={require('../assets/tietoviisas-on-screen.png')}
+      source={require('../assets/tietoviisas-asetukset.png')}
       style={styles.backgroundImage}
     >
-      <Text style={styles.text}>Asetukset</Text>
         <StandardButton
           text={isMusicPlaying ? "Taustamusiikki päällä" : "Taustamusiikki pois"}
           onPress={toggleMusic}
